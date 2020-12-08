@@ -16,23 +16,23 @@ public class SCTreeTest {
 
     @Test
     public void emptyTree() {
-        assertTrue(SGT.IsEmpty()); // пустой? да
-        assertFalse(SGT.FindKey(0)); // если элемента нет, то null
+        assertTrue(SGT.isEmpty());
+        assertFalse(SGT.findKey(0));
 
-        SGT.EmptyTree();
+        SGT.emptyTree();
     }
 
     @Test
     public void add() {
         SGT.add(5);
-        assertTrue(SGT.FindKey(5)); // есть ли 5? да
-        assertEquals(1, SGT.size()); // size
+        assertTrue(SGT.findKey(5));
+        assertEquals(1, SGT.size());
 
         SGT.add(6);
         SGT.add(7);
-        assertEquals(3, SGT.size()); // size
+        assertEquals(3, SGT.size());
 
-        SGT.EmptyTree();
+        SGT.emptyTree();
     }
 
     @Test
@@ -41,16 +41,16 @@ public class SCTreeTest {
         SGT.add(6);
         assertEquals(2, SGT.size());
 
-        SGT.Delete(5);
+        SGT.delete(5);
         SGT.add(7);
         SGT.add(8);
         assertEquals(3, SGT.size());
 
         // попытаем удалить элемент, которо нет
-        SGT.Delete(55555);
+        SGT.delete(55555);
         assertEquals(3, SGT.size());
 
-        SGT.EmptyTree();
+        SGT.emptyTree();
     }
 
     @Test
@@ -66,7 +66,7 @@ public class SCTreeTest {
         assertEquals(3, SGT.first());
         assertEquals(20, SGT.last());
 
-        SGT.EmptyTree();
+        SGT.emptyTree();
     }
 
     @Test
@@ -77,7 +77,6 @@ public class SCTreeTest {
         SGT.add(7);
         SGT.add(4);
         SGT.add(3);
-        SGT.add(14);
         SGT.add(14);
         SGT.add(20);
 
@@ -91,7 +90,7 @@ public class SCTreeTest {
         SortedSet<Integer> subSet = SGT.subSet(5, 20);
         assertEquals(set, subSet);
 
-        SGT.EmptyTree();
+        SGT.emptyTree();
     }
 
     @Test
@@ -117,9 +116,9 @@ public class SCTreeTest {
         queueInOrderTest.add(20);
         queueInOrderTest.add(65);
 
-        SGT.InOrder();
+        SGT.inOrder();
         assertEquals(queueInOrderTest, SGT.queueInOrder);
 
-        SGT.EmptyTree();
+        SGT.emptyTree();
     }
 }

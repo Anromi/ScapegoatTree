@@ -3,22 +3,22 @@ package main;
 import java.util.*;
 
 public class ScapegoatTree<T extends Comparable<T>> extends AbstractSet<T> implements SortedSet<T> {
-    Queue<T> queueInOrder = new LinkedList<T>();
-    private NodeSCG<T> Root;
+    Queue<T> queueInOrder = new LinkedList<>();
+    private NodeSCG<T> root;
     private int n;
     private int q;
 
     ScapegoatTree() {
-        Root = null;
+        root = null;
         n = 0;
     }
 
-    public boolean IsEmpty() {
-        return Root == null;
+    public boolean isEmpty() {
+        return root == null;
     }
 
-    public void EmptyTree() {
-        Root = null;
+    public void emptyTree() {
+        root = null;
         n = 0;
     }
 
@@ -26,52 +26,52 @@ public class ScapegoatTree<T extends Comparable<T>> extends AbstractSet<T> imple
         return n;
     }
 
-    private int GetSize(NodeSCG<T> Rt) {
-        if (Rt == null) {
+    private int setSize(NodeSCG<T> rt) {
+        if (rt == null) {
             return 0;
         } else {
             int i = 1;
-            i += GetSize(Rt.left);
-            i += GetSize(Rt.right);
+            i += setSize(rt.left);
+            i += setSize(rt.right);
             return i;
         }
     }
 
     // Проверка элемента дерева
-    public boolean FindKey(T Key) {
-        if (Root == null)
+    public boolean findKey(T Key) {
+        if (root == null)
             return false;
-        return FindKey(Root, Key);
+        return findKey(root, Key);
     }
 
-    private boolean FindKey(NodeSCG<T> Rt, T Key) {
-        int comparison = Key.compareTo(Rt.value);
+    private boolean findKey(NodeSCG<T> rt, T key) {
+        int comparison = key.compareTo(rt.value);
         if (comparison == 0) {
             return true;
         } else if (comparison < 0) {
-            if (Rt.left == null)
+            if (rt.left == null)
                 return true;
-            return FindKey(Rt.left, Key);
+            return findKey(rt.left, key);
         } else {
-            if (Rt.right == null)
+            if (rt.right == null)
                 return true;
-            return FindKey(Rt.right, Key);
+            return findKey(rt.right, key);
         }
     }
 
     // Функция для получения значения log32 (n)
-    private static final int Log32(int Val) {
+    private static final int log32(int val) {
         final double lg32 = 2.4663034623764317;
-        return (int)Math.ceil(lg32 * Math.log(Val));
+        return (int)Math.ceil(lg32 * Math.log(val));
     }
 
     // Функция с глубиной, выполняет вставку и возращает глубуну вставленного узла
-    public int InsertWithDepth(NodeSCG<T> N) {
+    public int insertWithDepth(NodeSCG<T> tNodeSCG) {
 
         // Если дерево пусто
-        NodeSCG<T> Rt = Root;
-        if(Rt == null) {
-            Root = N;
+        NodeSCG<T> rt = root;
+        if(rt == null) {
+            root = tNodeSCG;
             n++;
             q++;
             return 0;
@@ -81,21 +81,21 @@ public class ScapegoatTree<T extends Comparable<T>> extends AbstractSet<T> imple
         boolean inserted = false;
         int depth = 0;
         do {
-            if (0 < (Rt.value).compareTo((N.value))) {
-                if (Rt.left == null) {
-                    Rt.left = N;
-                    N.parent = Rt;
+            if (0 < (rt.value).compareTo((tNodeSCG.value))) {
+                if (rt.left == null) {
+                    rt.left = tNodeSCG;
+                    tNodeSCG.parent = rt;
                     inserted = true;
                 } else {
-                    Rt = Rt.left;
+                    rt = rt.left;
                 }
-            } else if ((N.value).compareTo(Rt.value) > 0) {
-                if (Rt.right == null) {
-                    Rt.right = N;
-                    N.parent = Rt;
+            } else if ((tNodeSCG.value).compareTo(rt.value) > 0) {
+                if (rt.right == null) {
+                    rt.right = tNodeSCG;
+                    tNodeSCG.parent = rt;
                     inserted = true;
                 } else {
-                    Rt = Rt.right;
+                    rt = rt.right;
                 }
             } else {
                 return -1;
@@ -108,58 +108,58 @@ public class ScapegoatTree<T extends Comparable<T>> extends AbstractSet<T> imple
     }
 
     // Чтобы вставить новый элемент в дерево
-    public boolean add(T Key) {
-        NodeSCG<T> n = new NodeSCG<T>(Key);
-        int depth = InsertWithDepth(n);
-        if (depth > Log32(q)) {         // Если дерево становится неуравновешенным
+    public boolean add(T key) {
+        NodeSCG<T> n = new NodeSCG<>(key);
+        int depth = insertWithDepth(n);
+        if (depth > log32(q)) {         // Если дерево становится неуравновешенным
 
             // Превышена глубина, найдем козла отпущения
             NodeSCG<T> temp = n.parent;
-            while (3 * GetSize(temp) <= 2 * GetSize(temp.parent)) {
+            while (3 * setSize(temp) <= 2 * setSize(temp.parent)) {
                 temp = temp.parent;
             }
-            Rebuild(temp.parent);
+            rebuild(temp.parent);
         }
         return false;
     }
 
     // Функция для восстановления дерева и узла N
-    public void Rebuild(NodeSCG<T> N) {
-        int NodeSize = GetSize(N);
-        NodeSCG<T> Parent = N.parent;
+    public void rebuild(NodeSCG<T> tNodeSCG) {
+        int nodeSize = setSize(tNodeSCG);
+        NodeSCG<T> parent = tNodeSCG.parent;
         List<NodeSCG<T>> list = new ArrayList<>();
-        Pack(N, list, 0);
-        if (Parent == null) {
-            Root = BuildBalanced(list, 0, NodeSize);
-            Root.parent = null;
-        } else if (Parent.right == N) {
-            Parent.right = BuildBalanced(list, 0, NodeSize);
-            Parent.right.parent = Parent;
+        pack(tNodeSCG, list, 0);
+        if (parent == null) {
+            root = buildBalanced(list, 0, nodeSize);
+            root.parent = null;
+        } else if (parent.right == tNodeSCG) {
+            parent.right = buildBalanced(list, 0, nodeSize);
+            parent.right.parent = parent;
         } else {
-            Parent.left = BuildBalanced(list, 0, NodeSize);
-            Parent.left.parent = Parent;
+            parent.left = buildBalanced(list, 0, nodeSize);
+            parent.left.parent = parent;
         }
     }
 
-    public int Pack(NodeSCG<T> N, List<NodeSCG<T>> list, int i) {
-        if(N==null)
+    public int pack(NodeSCG<T> tNodeSCG, List<NodeSCG<T>> list, int i) {
+        if(tNodeSCG==null)
             return i;
-        i=Pack(N.left,list,i);
-        list.set(i++, N);
-        return Pack(N.right,list,i);
+        i=pack(tNodeSCG.left,list,i);
+        list.set(i++, tNodeSCG);
+        return pack(tNodeSCG.right,list,i);
     }
 
     // Функция для сбалансированных узлов
-    public NodeSCG<T> BuildBalanced(List<NodeSCG<T>> list, int i, int NodeSize) {
-        if (NodeSize == 0)
+    public NodeSCG<T> buildBalanced(List<NodeSCG<T>> list, int i, int nodeSize) {
+        if (nodeSize == 0)
             return null;
-        int m = NodeSize / 2;
-        list.get(i + m).left = BuildBalanced(list, i, m);
+        int m = nodeSize / 2;
+        list.get(i + m).left = buildBalanced(list, i, m);
         if (list.get(i + m).left != null) {
             list.get(i + m).left.parent = list.get(i + m);
         }
         // сохраняются в правом поддереве
-        list.get(i + m).right = BuildBalanced(list, i + m + 1, NodeSize - m - 1);
+        list.get(i + m).right = buildBalanced(list, i + m + 1, nodeSize - m - 1);
         if (list.get(i + m).right != null) {
             list.get(i + m).right.parent = list.get(i + m);
         }
@@ -167,47 +167,47 @@ public class ScapegoatTree<T extends Comparable<T>> extends AbstractSet<T> imple
     }
 
     // Обход порядка
-    public void InOrder() { InOrder(Root); }
+    public void inOrder() { inOrder(root); }
 
-    private void InOrder(NodeSCG<T> Rt) {
-        if (Rt != null) {
-            InOrder(Rt.left);
-            queueInOrder.add(Rt.value);
-            InOrder(Rt.right);
+    private void inOrder(NodeSCG<T> rt) {
+        if (rt != null) {
+            inOrder(rt.left);
+            queueInOrder.add(rt.value);
+            inOrder(rt.right);
         }
     }
 
     // Удаление
-    public void Delete(T Key) { Root=Delete(Root,Key); }
+    public void delete(T key) { root=delete(root,key); }
 
-    private NodeSCG<T> Delete(NodeSCG<T> Rt, T Key) {
-        if (Rt == null)
-            return Rt;
-        if (0 < (Rt.value).compareTo(Key)) {
-            Rt.left = Delete(Rt.left, Key);
-        } else if (Key.compareTo(Rt.value) > 0) {
-            Rt.right = Delete(Rt.right, Key);
+    private NodeSCG<T> delete(NodeSCG<T> rt, T key) {
+        if (rt == null)
+            return rt;
+        if (0 < (rt.value).compareTo(key)) {
+            rt.left = delete(rt.left, key);
+        } else if (key.compareTo(rt.value) > 0) {
+            rt.right = delete(rt.right, key);
         } else {
-            if (Rt.left == null) {
+            if (rt.left == null) {
                 n--;
-                return Rt.right;
-            } else if (Rt.right == null) {
+                return rt.right;
+            } else if (rt.right == null) {
                 n--;
-                return Rt.left;
+                return rt.left;
             }
-            Rt.value = MinVal(Rt.right);
-            Rt.right = Delete(Rt.right, Rt.value);
+            rt.value = minVal(rt.right);
+            rt.right = delete(rt.right, rt.value);
         }
-        return Rt;
+        return rt;
     }
 
-    private T MinVal(NodeSCG<T> Rt) {
-        T Minimum = Rt.value;
-        while (Rt.left != null) {
-            Minimum = Rt.left.value;
-            Rt = Rt.left;
+    private T minVal(NodeSCG<T> rt) {
+        T minimum = rt.value;
+        while (rt.left != null) {
+            minimum = rt.left.value;
+            rt = rt.left;
         }
-        return Minimum;
+        return minimum;
     }
 
     @Override
@@ -243,9 +243,9 @@ public class ScapegoatTree<T extends Comparable<T>> extends AbstractSet<T> imple
 
     @Override
     public T first() {
-        if (Root == null)
+        if (root == null)
             throw new NoSuchElementException();
-        NodeSCG<T> current = Root;
+        NodeSCG<T> current = root;
         while (current.left != null)
             current = current.left;
         return current.value;
@@ -253,9 +253,9 @@ public class ScapegoatTree<T extends Comparable<T>> extends AbstractSet<T> imple
 
     @Override
     public T last() {
-        if (Root == null)
+        if (root == null)
             throw new NoSuchElementException();
-        NodeSCG<T> current = Root;
+        NodeSCG<T> current = root;
         while (current.right != null)
             current = current.right;
         return current.value;
@@ -269,8 +269,8 @@ public class ScapegoatTree<T extends Comparable<T>> extends AbstractSet<T> imple
         T current = null;
 
         private SCGTreeIterator() {
-            if (Root != null)
-                wholeStack(Root);
+            if (root != null)
+                wholeStack(root);
         }
 
         public void wholeStack(NodeSCG<T> current) {
